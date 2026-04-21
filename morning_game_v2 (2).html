@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🌅 My Morning Routine Game</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700;800&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Nunito',sans-serif;touch-action:none;}
+body{background:#87CEEB;}
+
+/* SKY */
+.sky{position:fixed;inset:0;z-index:0;background:linear-gradient(180deg,#4FC3F7 0%,#81D4FA 30%,#E1F5FE 80%,#FFF9C4 100%);}
+.cloud{position:absolute;background:rgba(255,255,255,.85);border-radius:50px;animation:drift linear infinite;}
+.cloud::before,.cloud::after{content:'';position:absolute;background:rgba(255,255,255,.85);border-radius:50%;}
+.c1{width:120px;height:40px;top:8%;left:-130px;animation-duration:35s;animation-delay:-5s;}
+.c1::before{width:60px;height:60px;top:-30px;left:15px;}
+.c1::after{width:45px;height:45px;top:-20px;left:55px;}
+.c2{width:90px;height:30px;top:18%;left:-100px;animation-duration:45s;animation-delay:-18s;}
+.c2::before{width:45px;height:45px;top:-25px;left:10px;}
+.c2::after{width:35px;height:35px;top:-16px;left:40px;}
+.c3{width:150px;height:48px;top:5%;left:-160px;animation-duration:55s;animation-delay:-30s;}
+.c3::before{width:70px;height:70px;top:-38px;left:18px;}
+.c3::after{width:55px;height:55px;top:-28px;left:70px;}
+@keyframes drift{from{left:-200px}to{left:110vw}}
+
+#app{position:relative;z-index:1;width:100%;height:100%;display:flex;flex-direction:column;}
+#cc{position:fixed;inset:0;pointer-events:none;z-index:200;}
+
+/* ── TOP BAR ── */
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;
+  background:rgba(255,255,255,.90);backdrop-filter:blur(6px);
+  border-bottom:3px solid rgba(255,255,255,.6);flex-shrink:0;gap:8px;min-height:54px;}
+.lv-pill{font-size:clamp(13px,2vw,19px);font-weight:900;padding:5px 14px;
+  border-radius:22px;color:#fff;white-space:nowrap;flex-shrink:0;}
+.lp-1{background:#FF8F00;box-shadow:0 3px 0 #E65100;}
+.lp-2{background:#3949AB;box-shadow:0 3px 0 #1A237E;}
+.lp-3{background:#2E7D32;box-shadow:0 3px 0 #1B5E20;}
+.dots{display:flex;gap:7px;align-items:center;}
+.dot{width:15px;height:15px;border-radius:50%;background:rgba(0,0,0,.15);transition:all .3s;flex-shrink:0;}
+.dot.done{background:#FFD700;box-shadow:0 0 6px rgba(255,215,0,.7);}
+.dot.cur{background:#FF4444;transform:scale(1.35);box-shadow:0 0 8px rgba(255,68,68,.5);}
+.star-disp{font-size:clamp(14px,2vw,19px);font-weight:900;color:#E65100;white-space:nowrap;display:flex;align-items:center;gap:3px;}
+.music-btn{background:rgba(255,255,255,.7);border:2.5px solid rgba(255,165,0,.5);border-radius:50%;
+  width:38px;height:38px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:transform .15s;box-shadow:0 2px 6px rgba(0,0,0,.1);}
+.music-btn:active{transform:scale(.9);}
+
+/* ── SCREEN BASE ── */
+.scr{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;
+  justify-content:center;padding:16px;gap:12px;overflow:hidden;}
+.scr.show{display:flex;}
+@keyframes popIn{from{transform:scale(.6) translateY(20px);opacity:0}to{transform:none;opacity:1}}
+@keyframes cardSlide{from{transform:translateX(80px) scale(.9);opacity:0}to{transform:none;opacity:1}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes sunrise{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}
+@keyframes spin{from{transform:rotate(-15deg) scale(.5)}to{transform:none}}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* ── IMAGES ── */
+.img-badge{width:28px;height:28px;object-fit:contain;border-radius:6px;vertical-align:middle;margin-right:4px;}
+.img-card{width:clamp(110px,16vw,160px);height:clamp(110px,16vw,160px);object-fit:contain;
+  border-radius:18px;animation:bounce 2s ease-in-out infinite;display:block;margin:0 auto;}
+.img-panel{width:clamp(70px,10vw,110px);height:clamp(70px,10vw,110px);object-fit:contain;border-radius:12px;display:block;}
+.img-reward{width:clamp(70px,10vw,95px);height:clamp(70px,10vw,95px);object-fit:contain;border-radius:12px;display:block;animation:spin .5s ease-out;}
+.img-mini{width:34px;height:34px;object-fit:contain;border-radius:8px;vertical-align:middle;margin-right:5px;}
+
+/* ── WELCOME ── */
+#s-welcome{background:transparent;}
+.sun{font-size:clamp(70px,12vw,100px);animation:sunrise 1.2s ease-out;text-align:center;}
+.wc-title{font-family:'Baloo 2',sans-serif;font-size:clamp(30px,5.5vw,56px);font-weight:800;
+  color:#E65100;text-align:center;text-shadow:0 3px 0 rgba(255,255,255,.7);animation:popIn .5s .3s both;}
+.wc-sub{font-size:clamp(16px,2.5vw,24px);font-weight:700;color:#1565C0;text-align:center;
+  background:rgba(255,255,255,.75);border-radius:16px;padding:9px 20px;animation:popIn .5s .5s both;}
+.obj-card{background:rgba(255,255,255,.88);border-radius:20px;border:3px solid #FFB74D;
+  padding:12px 20px;max-width:520px;text-align:center;animation:popIn .5s .7s both;}
+.obj-title{font-size:13px;font-weight:900;color:#FF8F00;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;}
+.obj-text{font-size:clamp(14px,2vw,18px);font-weight:700;color:#4E342E;line-height:1.5;}
+.word-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;animation:popIn .5s .9s both;}
+.wbadge{background:rgba(255,255,255,.82);border-radius:14px;padding:6px 12px;
+  font-size:clamp(13px,1.8vw,17px);font-weight:800;border:2.5px solid rgba(0,0,0,.1);
+  display:flex;align-items:center;}
+
+/* ── LEVEL INTRO ── */
+#s-lv-intro{background:transparent;}
+.lvi-badge-big{font-family:'Baloo 2',sans-serif;font-size:clamp(58px,10vw,88px);font-weight:800;
+  width:clamp(115px,17vw,155px);height:clamp(115px,17vw,155px);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;color:#fff;animation:popIn .5s ease-out;flex-shrink:0;}
+.lvi-1{background:#FF8F00;box-shadow:0 6px 0 #E65100;}
+.lvi-2{background:#3949AB;box-shadow:0 6px 0 #1A237E;}
+.lvi-3{background:#2E7D32;box-shadow:0 6px 0 #1B5E20;}
+.lvi-card{background:rgba(255,255,255,.9);border-radius:24px;padding:20px 26px;max-width:560px;text-align:center;animation:popIn .5s .2s both;}
+.lvi-name{font-family:'Baloo 2',sans-serif;font-size:clamp(24px,4vw,40px);font-weight:800;margin-bottom:7px;}
+.lvi-1 .lvi-name{color:#E65100;}.lvi-2 .lvi-name{color:#1A237E;}.lvi-3 .lvi-name{color:#1B5E20;}
+.lvi-desc{font-size:clamp(15px,2.2vw,20px);font-weight:700;color:#424242;line-height:1.5;margin-bottom:8px;}
+.lvi-reward{font-size:clamp(13px,1.8vw,17px);font-weight:800;color:#FF8F00;}
+.lvi-words-row{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-top:8px;}
+
+/* ── LV 1 WORD CARD ── */
+#s-lv1{background:transparent;}
+.lv1-card{border-radius:28px;padding:clamp(18px,3.5vw,36px);text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  max-width:580px;width:90%;animation:cardSlide .4s ease-out;
+  box-shadow:0 8px 32px rgba(0,0,0,.13);}
+.lv1-card-word{font-family:'Baloo 2',sans-serif;font-size:clamp(40px,7vw,68px);font-weight:800;letter-spacing:2px;}
+.lv1-card-sentence{font-size:clamp(17px,2.8vw,25px);font-weight:700;
+  background:rgba(255,255,255,.6);border-radius:14px;padding:7px 16px;margin-top:2px;}
+.lv1-card-tap{font-size:clamp(13px,1.8vw,17px);font-weight:800;opacity:.7;margin-top:2px;animation:pulse 1.5s ease-in-out infinite;}
+.nav-dots{display:flex;gap:11px;justify-content:center;margin-top:2px;}
+.nav-dot{width:13px;height:13px;border-radius:50%;background:rgba(255,255,255,.5);border:2px solid rgba(0,0,0,.15);}
+.nav-dot.act{background:#FF8F00;border-color:#E65100;transform:scale(1.2);}
+
+/* ── WRITE SCREEN ── */
+#s-write{background:transparent;}
+.write-wrap{width:100%;flex:1;display:flex;overflow:hidden;}
+.info-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:12px 10px;gap:8px;flex-shrink:0;background:rgba(255,255,255,.78);
+  border-right:3px solid rgba(255,255,255,.5);width:clamp(200px,26%,280px);}
+.ip-word{font-family:'Baloo 2',sans-serif;font-size:clamp(26px,4vw,44px);font-weight:800;text-align:center;}
+.ip-instr{font-size:clamp(13px,1.8vw,17px);font-weight:800;text-align:center;
+  background:rgba(255,255,255,.7);border-radius:12px;padding:5px 10px;line-height:1.4;}
+.lv-pip{color:#fff;border-radius:14px;padding:5px 13px;font-size:clamp(12px,1.7vw,16px);font-weight:800;}
+.canvas-panel{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;gap:7px;}
+.cv-label{font-size:clamp(13px,1.8vw,17px);font-weight:800;color:rgba(0,0,0,.42);}
+.cv-wrap{border-radius:16px;overflow:hidden;border:3px solid rgba(255,255,255,.85);
+  box-shadow:0 4px 20px rgba(0,0,0,.12);background:#fff;flex-shrink:0;}
+canvas#cv{display:block;touch-action:none;cursor:crosshair;}
+.cv-btns{display:flex;gap:11px;align-items:center;}
+@media(max-width:600px),(orientation:portrait){
+  .write-wrap{flex-direction:column;}
+  .info-panel{flex-direction:row;width:100%;border-right:none;border-bottom:3px solid rgba(255,255,255,.5);
+    padding:8px 12px;gap:10px;justify-content:space-around;flex-wrap:wrap;}
+  .lv-pip{display:none;}
+}
+
+/* ── BUTTONS ── */
+.btn{border:none;font-family:'Nunito',sans-serif;font-weight:900;border-radius:18px;
+  cursor:pointer;transition:transform .1s,box-shadow .1s;}
+.btn:active{transform:translateY(3px)!important;}
+.btn-start{font-size:clamp(22px,3.8vw,32px);padding:15px 44px;background:#FF6D00;color:#fff;
+  box-shadow:0 6px 0 #BF360C;border-radius:50px;}
+.btn-start:active{box-shadow:0 2px 0 #BF360C;}
+.btn-next{font-size:clamp(17px,2.8vw,26px);padding:11px 28px;background:#1565C0;color:#fff;
+  box-shadow:0 5px 0 #0D47A1;border-radius:18px;}
+.btn-next:active{box-shadow:0 2px 0 #0D47A1;}
+.btn-done{font-size:clamp(16px,2.4vw,23px);padding:10px 24px;background:#2E7D32;color:#fff;
+  box-shadow:0 5px 0 #1B5E20;border-radius:16px;}
+.btn-done:active{box-shadow:0 2px 0 #1B5E20;}
+.btn-clear{font-size:clamp(14px,2vw,20px);padding:10px 18px;background:#ECEFF1;color:#546E7A;
+  border:2.5px solid #B0BEC5;border-radius:16px;}
+.btn-replay{font-size:clamp(17px,2.8vw,25px);padding:11px 26px;background:#FF8F00;color:#fff;
+  box-shadow:0 5px 0 #E65100;border-radius:18px;}
+.btn-replay:active{box-shadow:0 2px 0 #E65100;}
+
+/* ── REWARD ── */
+#s-reward{background:transparent;}
+.rw-card{background:rgba(255,255,255,.92);border-radius:28px;padding:26px 30px;max-width:520px;width:90%;
+  text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;
+  animation:popIn .4s ease-out;box-shadow:0 8px 32px rgba(0,0,0,.1);}
+.rw-title{font-family:'Baloo 2',sans-serif;font-size:clamp(28px,5vw,46px);font-weight:800;color:#E65100;}
+.rw-word-badge{font-family:'Baloo 2',sans-serif;font-size:clamp(20px,3.2vw,32px);font-weight:900;
+  padding:8px 24px;border-radius:18px;color:#fff;}
+.rw-stars-row{font-size:clamp(30px,5vw,48px);letter-spacing:8px;}
+.rw-msg{font-size:clamp(16px,2.4vw,22px);font-weight:700;color:#2E7D32;}
+
+/* ── LEVEL REWARD ── */
+#s-lv-reward{background:transparent;}
+.lvr-card{background:rgba(255,255,255,.92);border-radius:28px;padding:26px 30px;max-width:560px;
+  width:90%;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;
+  animation:popIn .4s ease-out;box-shadow:0 8px 32px rgba(0,0,0,.12);}
+.lvr-trophy{font-size:clamp(78px,13vw,105px);animation:bounce 1.5s ease-in-out infinite;}
+.lvr-title{font-family:'Baloo 2',sans-serif;font-size:clamp(28px,4.8vw,46px);font-weight:800;}
+.lvr-badge-row{display:flex;align-items:center;gap:9px;justify-content:center;flex-wrap:wrap;}
+.lvr-badge{font-size:clamp(13px,1.8vw,17px);font-weight:900;padding:7px 16px;border-radius:20px;color:#fff;}
+.lb-1{background:#FF8F00;}.lb-2{background:#3949AB;}.lb-3{background:#2E7D32;}
+.lvr-sub{font-size:clamp(15px,2.2vw,21px);font-weight:700;color:#424242;}
+.lvr-words{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;}
+.lvr-w{border-radius:12px;padding:5px 12px;font-size:clamp(13px,1.8vw,17px);font-weight:800;
+  display:flex;align-items:center;}
+
+/* ── FINAL ── */
+#s-final{background:transparent;}
+.final-card{background:rgba(255,255,255,.92);border-radius:28px;padding:26px 30px;max-width:580px;
+  width:90%;text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px;
+  animation:popIn .4s ease-out;box-shadow:0 8px 32px rgba(0,0,0,.12);}
+.final-trophy{font-size:clamp(78px,13vw,105px);}
+.final-title{font-family:'Baloo 2',sans-serif;font-size:clamp(32px,5.5vw,50px);font-weight:800;color:#E65100;}
+.final-stars{font-size:clamp(26px,4.2vw,40px);font-weight:900;color:#FF8F00;}
+.final-words{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.fw{border-radius:14px;padding:7px 14px;font-size:clamp(14px,2.2vw,20px);font-weight:800;
+  display:flex;align-items:center;}
+.final-msg{font-size:clamp(17px,2.6vw,24px);font-weight:800;color:#2E7D32;}
+</style>
+</head>
+<body>
+
+<div class="sky">
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
+  <div class="cloud c3"></div>
+</div>
+
+<canvas id="cc"></canvas>
+
+<div id="app">
+  <!-- TOP BAR -->
+  <div class="top-bar" id="topbar" style="display:none;">
+    <div class="lv-pill" id="tb-lv">Level 1</div>
+    <div class="dots" id="tb-dots"></div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="star-disp">⭐ <span id="tb-stars">0</span></div>
+      <button class="music-btn" id="music-btn" onclick="toggleMusic(this)" title="Toggle music">🎵</button>
+    </div>
+  </div>
+
+  <!-- WELCOME -->
+  <div class="scr show" id="s-welcome">
+    <div class="sun">🌅</div>
+    <div class="wc-title">My Morning Routine!</div>
+    <div class="wc-sub">A writing adventure — 3 levels! 🎮</div>
+    <div class="obj-card">
+      <div class="obj-title">🎯 I will learn to write…</div>
+      <div class="obj-text">5 morning words neatly and correctly!</div>
+    </div>
+    <div class="word-row" id="w-row"></div>
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;">
+      <button class="btn btn-start" onclick="beginGame()">Let's Play! 🚀</button>
+    </div>
+  </div>
+
+  <!-- LEVEL INTRO -->
+  <div class="scr" id="s-lv-intro">
+    <div class="lvi-badge-big" id="lvi-badge">1</div>
+    <div class="lvi-card" id="lvi-card">
+      <div class="lvi-name" id="lvi-name"></div>
+      <div class="lvi-desc" id="lvi-desc"></div>
+      <div class="lvi-reward" id="lvi-reward"></div>
+      <div class="lvi-words-row" id="lvi-words"></div>
+    </div>
+    <button class="btn btn-next" id="lvi-btn">Start! ▶</button>
+  </div>
+
+  <!-- LV 1 WORD CARD -->
+  <div class="scr" id="s-lv1">
+    <div class="lv1-card" id="lv1-card" onclick="lv1Next()">
+      <div id="lv1-img"></div>
+      <div class="lv1-card-word" id="lv1-word">wake up</div>
+      <div class="lv1-card-sentence" id="lv1-sent"></div>
+      <div class="lv1-card-tap">👆 Tap to continue</div>
+      <div class="nav-dots" id="lv1-nav"></div>
+    </div>
+  </div>
+
+  <!-- WRITE SCREEN (LV 2 + 3) -->
+  <div class="scr" id="s-write">
+    <div class="write-wrap" id="write-wrap">
+      <div class="info-panel" id="info-panel">
+        <div id="ip-img"></div>
+        <div class="ip-word" id="ip-word">wake up</div>
+        <div class="ip-instr" id="ip-instr">Trace the word!</div>
+        <div class="lv-pip" id="ip-pip">✏️ Trace</div>
+      </div>
+      <div class="canvas-panel">
+        <div class="cv-label" id="cv-label">✏️ Write here!</div>
+        <div class="cv-wrap" id="cv-wrap">
+          <canvas id="cv"></canvas>
+        </div>
+        <div class="cv-btns">
+          <button class="btn btn-clear" onclick="clearCV()">🗑️ Clear</button>
+          <button class="btn btn-done" onclick="writeDone()">✅ Done!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WORD REWARD -->
+  <div class="scr" id="s-reward">
+    <div class="rw-card">
+      <div id="rw-img"></div>
+      <div class="rw-title" id="rw-title">Amazing!</div>
+      <div class="rw-word-badge" id="rw-badge">wake up</div>
+      <div class="rw-stars-row" id="rw-stars">⭐</div>
+      <div class="rw-msg" id="rw-msg"></div>
+      <button class="btn btn-next" id="rw-btn">Next ➡️</button>
+    </div>
+  </div>
+
+  <!-- LEVEL REWARD -->
+  <div class="scr" id="s-lv-reward">
+    <div class="lvr-card">
+      <div class="lvr-trophy" id="lvr-trophy">🏅</div>
+      <div class="lvr-title" id="lvr-title">Level 1 Complete!</div>
+      <div class="lvr-badge-row">
+        <div class="lvr-badge" id="lvr-badge">🌱 Word Explorer</div>
+      </div>
+      <div class="lvr-sub" id="lvr-sub">You learned all 5 words!</div>
+      <div class="lvr-words" id="lvr-words"></div>
+      <div class="star-disp" style="font-size:clamp(17px,2.8vw,24px);">Total Stars: ⭐ <span id="lvr-stars">0</span></div>
+      <button class="btn btn-next" id="lvr-btn">Next Level ➡️</button>
+    </div>
+  </div>
+
+  <!-- FINAL -->
+  <div class="scr" id="s-final">
+    <div class="final-card">
+      <div class="final-trophy">🏆</div>
+      <div class="final-title">Champion Writer!</div>
+      <div class="final-msg">You completed ALL 3 Levels! 🌟</div>
+      <div class="final-stars" id="fn-stars">⭐ 0 Stars!</div>
+      <div class="final-words" id="fn-words"></div>
+      <div class="final-msg" style="color:#E65100;font-size:clamp(19px,2.8vw,27px);">Excellent morning writing! 🌅</div>
+      <button class="btn btn-replay" onclick="restart()">Play Again 🔄</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════════════
+const WORDS = [
+  {word:'wake up',   img:'https://www.image2url.com/r2/default/images/1776725578317-a4982f31-e301-45c3-a741-82ff37bc0f26.png',  color:'#E65100', bg:'#FFF3E0', border:'#FFB74D', sent:'I wake up early in the morning!'},
+  {word:'bath',      img:'https://www.image2url.com/r2/default/images/1776725645575-7ae95b59-20dd-4175-9992-84a46a47cc17.png',  color:'#1565C0', bg:'#E3F2FD', border:'#90CAF9', sent:'I take a bath to keep clean!'},
+  {word:'dress up',  img:'https://www.image2url.com/r2/default/images/1776725716342-db9a94a8-9275-4050-b52e-6abac368537a.png',  color:'#6A1B9A', bg:'#F3E5F5', border:'#CE93D8', sent:'I dress up for school!'},
+  {word:'breakfast', img:'https://www.image2url.com/r2/default/images/1776725817199-cd35a006-4a97-4b4b-a8ab-05393bd08068.png',  color:'#2E7D32', bg:'#E8F5E9', border:'#81C784', sent:'I eat breakfast every morning!'},
+  {word:'school',    img:'https://www.image2url.com/r2/default/images/1776725901687-cbde2e006-4a97-4b4b-a8ab-05393bd08068.png', color:'#C2185B', bg:'#FCE4EC', border:'#F48FB1', sent:'I go to school with my bag!'},
+];
+const LV_INFO = [null,
+  {name:'⭐ Level 1 — Look & Learn', desc:'Look at each picture and word carefully.\nListen and say the word aloud!\nNo writing yet — just learn!', reward:'🌱 Badge: Word Explorer', stars:'1 star per word'},
+  {name:'✏️ Level 2 — Trace & Copy',  desc:'First, trace the dotted word with your stylus.\nThen copy the word in the empty box!\nUse the picture to help you.', reward:'✏️ Badge: Trace Master', stars:'2 stars per word'},
+  {name:'🌟 Level 3 — Write It!',      desc:'Look at the picture only.\nRemember the word and write it!\nYou are a star writer!', reward:'🏆 Badge: Champion Writer', stars:'3 stars per word'},
+];
+const LV_BADGES = ['','🌱 Word Explorer','✏️ Trace Master','🏆 Champion Writer'];
+const CHEERS = ['Amazing work! 🌟','You are a STAR! ⭐','Brilliant! 🎊','Well done! 👏','Superstar! 🏆','Fantastic! ✨','Keep going! 🎉','Wonderful! 🥳'];
+
+function mkImg(src, cls) { return `<img src="${src}" class="${cls}" alt="picture" onerror="this.style.opacity='.3'">`; }
+
+// ═══════════════════════════════════════════════
+//  MUSIC ENGINE  (Web Audio API)
+// ═══════════════════════════════════════════════
+let AC = null, musicOn = false, schedTimer = null, noteIdx = 0, nextBeat = 0;
+// C major pentatonic, two octaves (gentle range)
+const PENTA = [261.63,293.66,329.63,392.00,440.00,523.25,587.33,659.25,783.99,880.00];
+// A gentle morning melody — pattern: [note_index_in_PENTA, beat_duration]
+const MELODY = [
+  [0,1],[2,1],[4,1],[5,2],   // C D E C5 …
+  [5,1],[4,1],[2,1],[0,2],   // C5 E D C  …
+  [2,1],[4,1],[5,1],[7,2],   // D E C5 G5 …
+  [5,1],[4,1],[2,1],[0,3],   // C5 E D C (hold) …
+  [0,1],[4,1],[5,1],[7,2],   // C E C5 G5 …
+  [9,1],[7,1],[5,1],[4,3],   // A5 G5 C5 E (hold) …
+  [4,1],[5,1],[7,1],[5,2],   // E C5 G5 C5 …
+  [4,1],[2,1],[0,1],[0,3],   // E D C C (end phrase)
+];
+const BEAT_SEC = 0.44; // tempo
+
+function playBell(freq, t, dur) {
+  const o = AC.createOscillator();
+  const g = AC.createGain();
+  const m = AC.createGain();
+  m.gain.value = 0.09;
+  o.connect(g); g.connect(m); m.connect(AC.destination);
+  o.type = 'triangle';
+  o.frequency.value = freq;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(1.0, t + 0.018);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur * 0.80);
+  o.start(t); o.stop(t + dur + 0.05);
+}
+function playBass(freq, t, dur) {
+  const o = AC.createOscillator();
+  const g = AC.createGain();
+  const m = AC.createGain();
+  m.gain.value = 0.04;
+  o.connect(g); g.connect(m); m.connect(AC.destination);
+  o.type = 'sine';
+  o.frequency.value = freq / 2;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(0.8, t + 0.06);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur * 0.6);
+  o.start(t); o.stop(t + dur + 0.05);
+}
+function musicTick() {
+  if (!musicOn) return;
+  const now = AC.currentTime;
+  while (nextBeat < now + 0.35) {
+    const [ni, beats] = MELODY[noteIdx % MELODY.length];
+    const dur = beats * BEAT_SEC;
+    playBell(PENTA[ni], nextBeat, dur);
+    if (noteIdx % 4 === 0) playBass(PENTA[ni < 5 ? ni : ni - 5], nextBeat, dur * 1.4);
+    nextBeat += dur;
+    noteIdx++;
+  }
+  schedTimer = setTimeout(musicTick, 40);
+}
+function startMusic() {
+  if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)();
+  if (AC.state === 'suspended') AC.resume();
+  musicOn = true;
+  nextBeat = AC.currentTime + 0.12;
+  noteIdx = 0;
+  musicTick();
+}
+function stopMusic() {
+  musicOn = false;
+  if (schedTimer) clearTimeout(schedTimer);
+}
+function toggleMusic(btn) {
+  if (musicOn) { stopMusic(); btn.textContent = '🔇'; }
+  else { startMusic(); btn.textContent = '🎵'; }
+}
+
+// ═══════════════════════════════════════════════
+//  GAME STATE
+// ═══════════════════════════════════════════════
+let level=1, wi=0, stars=0, phase='trace'; // phase: trace | copy
+let drawing=false, lx=0, ly=0;
+let cv, ctx;
+
+// Populate welcome word badges
+(()=>{
+  const r = document.getElementById('w-row');
+  WORDS.forEach(w => {
+    r.innerHTML += `<div class="wbadge">${mkImg(w.img,'img-badge')} ${w.word}</div>`;
+  });
+})();
+
+// ── screen utils ──
+function show(id) {
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+}
+function setTopBar(lv, wIdx) {
+  const tb = document.getElementById('topbar');
+  const lp = document.getElementById('tb-lv');
+  document.getElementById('tb-stars').textContent = stars;
+  if (lv === 0) { tb.style.display = 'none'; return; }
+  tb.style.display = 'flex';
+  lp.textContent = `Level ${lv}`;
+  lp.className = 'lv-pill lp-' + lv;
+  document.getElementById('tb-dots').innerHTML =
+    WORDS.map((_,i) => `<div class="dot ${i<wIdx?'done':i===wIdx?'cur':''}"></div>`).join('');
+}
+
+// ── begin game (starts music on first user tap) ──
+function beginGame() { startMusic(); document.getElementById('music-btn').textContent='🎵'; goToLvIntro(1); }
+
+// ── LEVEL INTRO ──
+function goToLvIntro(lv) {
+  level = lv; wi = 0; phase = 'trace';
+  setTopBar(0, 0);
+  const info = LV_INFO[lv];
+  const b = document.getElementById('lvi-badge');
+  b.textContent = lv;
+  b.className = 'lvi-badge-big lvi-' + lv;
+  document.getElementById('lvi-card').className = 'lvi-card lvi-' + lv;
+  document.getElementById('lvi-name').textContent = info.name;
+  document.getElementById('lvi-desc').innerHTML = info.desc.replace(/\n/g,'<br>');
+  document.getElementById('lvi-reward').textContent = info.reward;
+  document.getElementById('lvi-words').innerHTML =
+    WORDS.map(w=>`<div class="wbadge" style="background:${w.bg};border:2px solid ${w.border};">${mkImg(w.img,'img-badge')} ${w.word}</div>`).join('');
+  const btn = document.getElementById('lvi-btn');
+  btn.onclick = lv === 1 ? startLv1 : startWriteLevel;
+  show('s-lv-intro');
+}
+
+// ── LEVEL 1 ──
+function startLv1() { wi=0; setTopBar(1,0); renderLv1Card(); show('s-lv1'); }
+function renderLv1Card() {
+  const w = WORDS[wi];
+  const card = document.getElementById('lv1-card');
+  card.style.background = w.bg;
+  card.style.border = `4px solid ${w.border}`;
+  card.style.animation = 'none';
+  requestAnimationFrame(() => { card.style.animation = 'cardSlide .4s ease-out'; });
+  document.getElementById('lv1-img').innerHTML = mkImg(w.img, 'img-card');
+  const wEl = document.getElementById('lv1-word');
+  wEl.textContent = w.word; wEl.style.color = w.color;
+  document.getElementById('lv1-sent').textContent = w.sent;
+  document.getElementById('lv1-nav').innerHTML =
+    WORDS.map((_,i) => `<div class="nav-dot ${i===wi?'act':''}"></div>`).join('');
+  setTopBar(1, wi);
+}
+function lv1Next() {
+  stars++;
+  if (wi < WORDS.length-1) { wi++; renderLv1Card(); }
+  else showLvReward(1);
+}
+
+// ── LEVELS 2 & 3 WRITING ──
+function startWriteLevel() { wi=0; phase='trace'; setTopBar(level,0); renderWriteScreen(); show('s-write'); initCV(); }
+function renderWriteScreen() {
+  const w = WORDS[wi];
+  const panel = document.getElementById('info-panel');
+  panel.style.background = w.bg;
+  document.getElementById('ip-img').innerHTML = mkImg(w.img, 'img-panel');
+  const ipw = document.getElementById('ip-word');
+  const pip = document.getElementById('ip-pip');
+  if (level === 2) {
+    ipw.textContent = w.word; ipw.style.color = w.color;
+    if (phase === 'trace') {
+      document.getElementById('ip-instr').textContent = 'Trace the dotted word!';
+      pip.textContent = '✏️ Trace'; pip.style.background = '#3949AB';
+      document.getElementById('cv-label').textContent = '✏️ Trace the letters!';
+    } else {
+      document.getElementById('ip-instr').textContent = 'Now COPY the word here!';
+      pip.textContent = '📋 Copy'; pip.style.background = '#6A1B9A';
+      document.getElementById('cv-label').textContent = '📋 Write the word!';
+    }
+  } else { // level 3
+    ipw.textContent = ''; // hide word — picture only
+    document.getElementById('ip-instr').textContent = 'Look at the picture!\nWrite the word! 🌟';
+    pip.textContent = '🌟 Write'; pip.style.background = '#2E7D32';
+    document.getElementById('cv-label').textContent = '🌟 Write the word!';
+  }
+  setTopBar(level, wi);
+}
+
+// ── CANVAS ──
+function initCV() {
+  cv = document.getElementById('cv');
+  const wrap = document.getElementById('cv-wrap');
+  const infoP = document.getElementById('info-panel');
+  const tb = document.getElementById('topbar');
+  const btns = document.querySelector('.cv-btns');
+  const lbl = document.getElementById('cv-label');
+  const isPort = window.matchMedia('(orientation:portrait)').matches || window.innerWidth < 601;
+  let cw, ch;
+  if (isPort) {
+    const infoH = infoP.offsetHeight || 130;
+    const tbH = tb.offsetHeight || 54;
+    const bH = (btns.offsetHeight||50) + (lbl.offsetHeight||26) + 32;
+    ch = Math.max(160, window.innerHeight - tbH - infoH - bH - 16);
+    cw = Math.min(window.innerWidth - 20, 700);
+  } else {
+    const infoW = infoP.offsetWidth || 240;
+    const tbH = tb.offsetHeight || 54;
+    const bH = (btns.offsetHeight||50) + (lbl.offsetHeight||26) + 28;
+    cw = Math.max(280, window.innerWidth - infoW - 20);
+    ch = Math.max(200, window.innerHeight - tbH - bH - 16);
+  }
+  cv.width = Math.floor(cw);
+  cv.height = Math.floor(ch);
+  ctx = cv.getContext('2d');
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  cv.onpointerdown = e => {
+    e.preventDefault(); drawing = true; cv.setPointerCapture(e.pointerId);
+    const p = getPos(e); lx = p.x; ly = p.y;
+    ctx.beginPath(); ctx.arc(lx,ly,4,0,Math.PI*2);
+    ctx.fillStyle = '#1A237E'; ctx.fill();
+  };
+  cv.onpointermove = e => {
+    e.preventDefault(); if (!drawing) return;
+    const p = getPos(e);
+    ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(p.x,p.y);
+    ctx.strokeStyle = '#1A237E'; ctx.lineWidth = 8; ctx.stroke();
+    lx = p.x; ly = p.y;
+  };
+  cv.onpointerup = cv.onpointercancel = () => { drawing = false; };
+  drawCVGuide();
+}
+function getPos(e) {
+  const r = cv.getBoundingClientRect();
+  return {x: e.clientX - r.left, y: e.clientY - r.top};
+}
+function drawCVGuide() {
+  ctx.clearRect(0,0,cv.width,cv.height);
+  const h = cv.height, w = cv.width;
+  const base = h * 0.70, mid = h * 0.36;
+  // Writing guide lines
+  ctx.save();
+  ctx.setLineDash([10,8]); ctx.strokeStyle = 'rgba(100,160,220,0.32)'; ctx.lineWidth = 1.5;
+  [base, mid].forEach(y => { ctx.beginPath(); ctx.moveTo(20,y); ctx.lineTo(w-20,y); ctx.stroke(); });
+  ctx.restore();
+  // Level 2 trace guide: dashed outlined text
+  if (level === 2 && phase === 'trace') {
+    const word = WORDS[wi].word;
+    const fs = Math.min(h * 0.47, w / (word.length * 0.56 + 0.4));
+    ctx.save();
+    ctx.font = `900 ${fs}px 'Baloo 2','Nunito',Arial`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.setLineDash([7,5]);
+    ctx.strokeStyle = 'rgba(140,140,180,0.52)';
+    ctx.lineWidth = 3.5;
+    ctx.strokeText(word, w/2, base - 3);
+    ctx.setLineDash([]);
+    ctx.fillStyle = 'rgba(190,190,220,0.16)';
+    ctx.fillText(word, w/2, base - 3);
+    ctx.restore();
+  }
+}
+function clearCV() { drawCVGuide(); }
+
+// ── WRITE DONE ──
+function writeDone() {
+  if (level === 2 && phase === 'trace') { phase='copy'; renderWriteScreen(); drawCVGuide(); return; }
+  stars += level === 2 ? 2 : 3;
+  showWordReward();
+}
+
+// ── WORD REWARD ──
+function showWordReward() {
+  const w = WORDS[wi];
+  document.getElementById('rw-img').innerHTML = mkImg(w.img, 'img-reward');
+  document.getElementById('rw-title').textContent = CHEERS[Math.floor(Math.random()*CHEERS.length)];
+  const badge = document.getElementById('rw-badge');
+  badge.textContent = w.word; badge.style.background = w.color;
+  const earned = level===2 ? 2 : 3;
+  document.getElementById('rw-stars').textContent = '⭐'.repeat(earned) + '☆'.repeat(3-earned);
+  document.getElementById('rw-msg').textContent = `+${earned} star${earned>1?'s':''}! Total: ⭐ ${stars}`;
+  const btn = document.getElementById('rw-btn');
+  if (wi < WORDS.length-1) {
+    btn.textContent = 'Next Word ➡️';
+    btn.onclick = () => { wi++; phase='trace'; renderWriteScreen(); drawCVGuide(); setTopBar(level,wi); show('s-write'); };
+  } else {
+    btn.textContent = `Level ${level} Done! 🎉`;
+    btn.onclick = () => showLvReward(level);
+  }
+  launchConfetti(earned * 9);
+  show('s-reward');
+}
+
+// ── LEVEL REWARD ──
+function showLvReward(lv) {
+  const cfgs = [null,
+    {trophy:'🌱', title:'Level 1 Complete!', sub:'You read all 5 morning words!',   btnTxt:'Start Level 2 ✏️', next:()=>goToLvIntro(2)},
+    {trophy:'✏️', title:'Level 2 Complete!', sub:'You traced and copied all 5 words!', btnTxt:'Start Level 3 🌟', next:()=>goToLvIntro(3)},
+    {trophy:'🏆', title:'All Levels Done!',  sub:'You are a Champion Writer!',      btnTxt:'See My Trophy! 🏆', next:showFinal},
+  ];
+  const c = cfgs[lv];
+  document.getElementById('lvr-trophy').textContent = c.trophy;
+  const title = document.getElementById('lvr-title');
+  title.textContent = c.title;
+  title.style.color = lv===1?'#E65100':lv===2?'#1A237E':'#1B5E20';
+  document.getElementById('lvr-badge').textContent = LV_BADGES[lv];
+  document.getElementById('lvr-badge').className = 'lvr-badge lb-'+lv;
+  document.getElementById('lvr-sub').textContent = c.sub;
+  document.getElementById('lvr-stars').textContent = stars;
+  document.getElementById('lvr-words').innerHTML =
+    WORDS.map(w=>`<div class="lvr-w" style="background:${w.bg};color:${w.color};border:2.5px solid ${w.border};">${mkImg(w.img,'img-badge')} ${w.word}</div>`).join('');
+  document.getElementById('lvr-btn').textContent = c.btnTxt;
+  document.getElementById('lvr-btn').onclick = c.next;
+  launchConfetti(50);
+  setTopBar(0,0);
+  show('s-lv-reward');
+}
+
+// ── FINAL ──
+function showFinal() {
+  document.getElementById('fn-stars').textContent = `⭐  ${stars}  Stars Earned!`;
+  document.getElementById('fn-words').innerHTML =
+    WORDS.map(w=>`<div class="fw" style="background:${w.bg};color:${w.color};border:2.5px solid ${w.border};">${mkImg(w.img,'img-mini')} ${w.word}</div>`).join('');
+  launchConfetti(90);
+  setTopBar(0,0);
+  show('s-final');
+}
+function restart() { stars=0; level=1; wi=0; phase='trace'; setTopBar(0,0); show('s-welcome'); }
+
+// ═══════════════════════════════════════════════
+//  CONFETTI
+// ═══════════════════════════════════════════════
+const cc = document.getElementById('cc');
+const cctx = cc.getContext('2d');
+let confetti = [];
+function resCC() { cc.width=window.innerWidth; cc.height=window.innerHeight; }
+resCC(); window.addEventListener('resize', resCC);
+function launchConfetti(n) {
+  const cols = ['#FF6D00','#FFD700','#2196F3','#E91E63','#4CAF50','#9C27B0','#FF5722','#00BCD4','#FF8F00','#F06292'];
+  for (let i=0; i<n; i++) {
+    confetti.push({
+      x:Math.random()*cc.width, y:-10, r:Math.random()*10+5,
+      c:cols[Math.floor(Math.random()*cols.length)],
+      vx:(Math.random()-.5)*6, vy:Math.random()*5+2.5,
+      rot:Math.random()*360, rspd:(Math.random()-.5)*9, life:1
+    });
+  }
+}
+function animCC() {
+  cctx.clearRect(0,0,cc.width,cc.height);
+  confetti = confetti.filter(p => p.y < cc.height+20 && p.life > 0);
+  confetti.forEach(p => {
+    p.x+=p.vx; p.y+=p.vy; p.rot+=p.rspd; p.life-=.006;
+    cctx.save();
+    cctx.globalAlpha = Math.max(0, p.life);
+    cctx.translate(p.x, p.y); cctx.rotate(p.rot*Math.PI/180);
+    cctx.fillStyle = p.c;
+    cctx.fillRect(-p.r/2, -p.r/2, p.r, p.r*0.6);
+    cctx.restore();
+  });
+  requestAnimationFrame(animCC);
+}
+animCC();
+
+window.addEventListener('resize', () => {
+  if (document.getElementById('s-write').classList.contains('show')) setTimeout(initCV, 100);
+});
+</script>
+</body>
+</html>
